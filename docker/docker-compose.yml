@@ -32,8 +32,8 @@ services:
     container_name: paperless-bigcapital-middleware
     restart: unless-stopped
     volumes:
-      #- ./config/config.ini:/app/config.ini:ro
-      - ./config/config.ini
+      - ./config/config.ini:/app/config.ini:ro
+      #- ./config/config.ini
       - ./logs:/app/logs
       - ./.env:/app/.env:ro
     environment:
