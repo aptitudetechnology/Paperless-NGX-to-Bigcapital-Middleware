@@ -18,6 +18,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Set up Docker # Added this step to ensure Docker and Docker Compose are available
+      uses: docker/setup-docker@v2
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
