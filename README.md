@@ -1,4 +1,4 @@
-** Paperless-NGX to Bigcapital Middleware **
+*** Paperless-NGX to Bigcapital Middleware ***
 
 A robust middleware solution that automatically imports financial documents (invoices and receipts) from Paperless-NGX into Bigcapital, streamlining your bookkeeping workflow.
 Prerequisites
