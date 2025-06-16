@@ -26,13 +26,12 @@ services:
 
   # Paperless-Bigcapital Middleware
   paperless-bigcapital-middleware:
-     build:
-       context: ../
-       dockerfile: docker/Dockerfile
-
-  container_name: paperless-bigcapital-middleware
-  restart: unless-stopped
-  volumes:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    container_name: paperless-bigcapital-middleware
+    restart: unless-stopped
+    volumes:
       - ./config.ini:/app/config.ini:ro
       - ./logs:/app/logs
       - ./.env:/app/.env:ro
