@@ -157,3 +157,113 @@ class TestDocumentEndpoints:
     def test_get_document_not_found(self, client):
         """Test getting a non-existent document."""
         with patch('database.models.ProcessedDocument.query') as mock_query:
+            mock_query.filter_by.return_value.first.return_value = None
+            
+            response = client.get('/api/documents/999')
+            
+            assert response.status_code == 404
+            data = json.loads(response.data)
+            assert 'message' in data
+            assert 'Document not found' in data['message']
+
+    def test_get_document_by_bigcapital_id_success(self, client, sample_processed_document):
+        """Test getting a document by its BigCapital ID."""
+        with patch('database.models.ProcessedDocument.query') as mock_query:
+            mock_query.filter_by.return_value.first.return_value = sample_processed_document
+            response = client.get(f'/api/documents/bigcapital/{sample_processed_document.bigcapital_id}')
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['bigcapital_id'] == sample_processed_document.bigcapital_id
+
+    def test_get_document_by_bigcapital_id_not_found(self, client):
+        """Test getting a non-existent document by BigCapital ID."""
+        with patch('database.models.ProcessedDocument.query') as mock_query:
+            mock_query.filter_by.return_value.first.return_value = None
+            response = client.get('/api/documents/bigcapital/non_existent_id')
+            assert response.status_code == 404
+            data = json.loads(response.data)
+            assert 'Document not found' in data['message']
+
+
+class TestErrorEndpoints:
+    """Test error log endpoints."""
+
+    def test_list_errors_empty(self, client):
+        """Test listing errors when none exist."""
+        with patch('database.models.ProcessingError.query') as mock_query:
+            mock_query.order_by.return_value.all.return_value = []
+            response = client.get('/api/errors')
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['errors'] == []
+            assert data['total'] == 0
+
+    def test_list_errors_with_data(self, client, sample_processing_error):
+        """Test listing errors with data."""
+        with patch('database.models.ProcessingError.query') as mock_query:
+            mock_query.order_by.return_value.all.return_value = [sample_processing_error]
+            response = client.get('/api/errors')
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert len(data['errors']) == 1
+            assert data['errors'][0]['paperless_id'] == sample_processing_error.paperless_id
+            assert data['errors'][0]['error_message'] == sample_processing_error.error_message
+
+    def test_get_error_details_success(self, client, sample_processing_error):
+        """Test getting details of a specific error."""
+        with patch('database.models.ProcessingError.query') as mock_query:
+            mock_query.filter_by.return_value.first.return_value = sample_processing_error
+            response = client.get(f'/api/errors/{sample_processing_error.id}')
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['id'] == sample_processing_error.id
+            assert data['error_message'] == sample_processing_error.error_message
+
+    def test_get_error_details_not_found(self, client):
+        """Test getting details of a non-existent error."""
+        with patch('database.models.ProcessingError.query') as mock_query:
+            mock_query.filter_by.return_value.first.return_value = None
+            response = client.get('/api/errors/999')
+            assert response.status_code == 404
+            data = json.loads(response.data)
+            assert 'Error not found' in data['message']
+
+    def test_retry_error_success(self, client, sample_processing_error):
+        """Test retrying a specific error."""
+        with patch('database.models.ProcessingError.query') as mock_error_query, \
+             patch('core.processor.DocumentProcessor.process_document') as mock_process:
+            
+            mock_error_query.filter_by.return_value.first.return_value = sample_processing_error
+            mock_process.return_value = True  # Simulate successful reprocessing
+            
+            response = client.post(f'/api/errors/{sample_processing_error.id}/retry')
+            
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data['message'] == 'Document reprocessing initiated.'
+            mock_process.assert_called_once_with(sample_processing_error.paperless_id)
+
+    def test_retry_error_not_found(self, client):
+        """Test retrying a non-existent error."""
+        with patch('database.models.ProcessingError.query') as mock_query:
+            mock_query.filter_by.return_value.first.return_value = None
+            response = client.post('/api/errors/999/retry')
+            assert response.status_code == 404
+            data = json.loads(response.data)
+            assert 'Error not found' in data['message']
+
+    def test_retry_error_processing_failure(self, client, sample_processing_error):
+        """Test retrying an error that fails during reprocessing."""
+        with patch('database.models.ProcessingError.query') as mock_error_query, \
+             patch('core.processor.DocumentProcessor.process_document') as mock_process:
+            
+            mock_error_query.filter_by.return_value.first.return_value = sample_processing_error
+            mock_process.side_effect = APIError("BigCapital API error")
+            
+            response = client.post(f'/api/errors/{sample_processing_error.id}/retry')
+            
+            assert response.status_code == 500
+            data = json.loads(response.data)
+            assert 'Failed to reprocess' in data['message']
+            assert 'BigCapital API error' in data['details']
+            mock_process.assert_called_once_with(sample_processing_error.paperless_id)
