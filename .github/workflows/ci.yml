@@ -46,7 +46,7 @@ jobs:
 
     - name: Run Unit and Database Tests
       run: |
-        docker-compose -f docker/docker-compose.yml up -d db
+        docker-compose -f docker/docker-compose.yml up -d middleware-db
         docker-compose -f docker/docker-compose.yml run --rm web pytest tests/test_core.py tests/test_clients.py tests/test_database.py tests/test_web.py
 
     - name: Run Integration Tests
