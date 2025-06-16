@@ -21,6 +21,47 @@ Features (planned)
     📊 Processing statistics and error tracking
     🔗 Seamless Bigcapital integration
 
+
+    paperless-bigcapital-middleware/
+├── config/
+│   ├── __init__.py
+│   ├── settings.py          # Centralized config management
+│   └── config.ini.example   # Template config
+├── core/
+│   ├── __init__.py
+│   ├── paperless_client.py  # Paperless-NGX API client
+│   ├── bigcapital_client.py # BigCapital API client
+│   └── processor.py         # Main processing logic
+├── database/
+│   ├── __init__.py
+│   ├── models.py           # SQLAlchemy models
+│   ├── connection.py       # DB connection management
+│   └── migrations/         # Schema files
+│       └── 001_initial.sql
+├── web/
+│   ├── __init__.py
+│   ├── app.py             # Flask app
+│   ├── routes.py          # API endpoints
+│   └── static/            # CSS/JS
+│       └── css/
+├── utils/
+│   ├── __init__.py
+│   ├── logger.py          # Logging setup
+│   └── exceptions.py      # Custom exceptions
+├── tests/
+│   ├── __init__.py
+│   └── test_core.py
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+├── scripts/
+│   ├── init.sh
+│   └── run.sh
+├── requirements.txt
+├── config.ini
+├── .env.example
+└── README.md
+
 Architecture
 
 Paperless-NGX → Middleware → PostgreSQL Database → Bigcapital
