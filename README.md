@@ -108,6 +108,32 @@ The `tests/` directory houses the comprehensive test suite for the `paperless-bi
 
 
 
+### 📁 File Breakdown
+
+- **`__init__.py`**  
+  This empty file signals to Python that the `tests` directory is a package. This is crucial for `pytest` to properly discover and import test modules and shared fixtures.
+
+- **`conftest.py`**  
+  This special `pytest` file defines fixtures shared across multiple test files. It includes:
+  - Flask app and client instances for web testing.
+  - An in-memory SQLite database session for isolated database tests.
+  - Reusable sample data objects (e.g., `ProcessedDocument`, `ProcessingError`) to streamline test setup.
+
+- **`test_core.py`**  
+  Contains unit tests for the core business logic, primarily focusing on `core/processor.py` and other central utilities. These tests isolate individual functions and classes, often using mocks for external dependencies.
+
+- **`test_clients.py`**  
+  Houses tests for the API clients (`core/paperless_client.py` and `core/bigcapital_client.py`). It focuses on verifying that your clients correctly construct HTTP requests and parse API responses, typically by mocking the actual network calls.
+
+- **`test_database.py`**  
+  Dedicated to testing your database models (`database/models.py`) and connection management (`database/connection.py`). It leverages the in-memory SQLite setup to ensure reliable data operations (Create, Read, Update, Delete) without affecting your development database.
+
+- **`test_web.py`**  
+  Tests the Flask web interface (`web/app.py`, `web/routes.py`). It simulates HTTP requests to your application's API endpoints, validating response status codes and data. Mocks are used to isolate the web layer from database and external API interactions.
+
+- **`test_integration.py`**  
+  Contains end-to-end integration tests that verify the complete document processing workflow. These tests confirm that different components of the middleware (e.g., fetching from Paperless-NGX, processing, sending to BigCapital, and database updates) interact correctly, often by running your Docker services and making real calls between them.
+
 
 
 Architecture
