@@ -18,8 +18,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Docker # Added this step to ensure Docker and Docker Compose are available
-      uses: docker/setup-docker@v2
+    # The 'docker/setup-docker' action is deprecated or no longer directly available for general use.
+    # The 'docker/setup-buildx-action' itself handles much of the Docker setup.
+    # We will ensure Docker is available by explicitly installing Docker Compose if needed,
+    # or relying on the base image which usually has Docker.
+    # For docker-compose specifically, we can install it directly.
+
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+      # This step should run before any docker-compose commands are used.
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
