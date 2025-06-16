@@ -26,9 +26,10 @@ services:
 
   # Paperless-Bigcapital Middleware
   paperless-bigcapital-middleware:
-    build:
-      context: ../
-      docker/Dockerfile: Dockerfile # Changed this from 'docker/Dockerfile'
+     build:
+       context: ../
+       dockerfile: docker/Dockerfile
+
     container_name: paperless-bigcapital-middleware
     restart: unless-stopped
     volumes:
