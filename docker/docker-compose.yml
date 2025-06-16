@@ -98,7 +98,7 @@ services:
 
   # Bigcapital service
   bigcapital:
-    image: bigcapital/bigcapital:latest
+    image: elestio/bigcapital-nginx
     container_name: bigcapital
     restart: unless-stopped
     ports:
