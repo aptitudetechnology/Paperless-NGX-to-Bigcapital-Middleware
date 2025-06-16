@@ -30,9 +30,9 @@ services:
        context: ../
        dockerfile: docker/Dockerfile
 
-    container_name: paperless-bigcapital-middleware
-    restart: unless-stopped
-    volumes:
+  container_name: paperless-bigcapital-middleware
+  restart: unless-stopped
+  volumes:
       - ./config.ini:/app/config.ini:ro
       - ./logs:/app/logs
       - ./.env:/app/.env:ro
